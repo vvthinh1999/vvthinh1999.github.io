@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chính sách bảo mật — BH Note</title>
+<meta name="description" content="Chính sách bảo mật của ứng dụng nhắn tin nội bộ BH Note.">
+<style>
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f6f7f9;
+  --line:#e2e5ea;
+  --line-soft:#eef0f3;
+  --text:#1c2028;
+  --muted:#5f6672;
+  --accent:#2f6bd8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  font-size:16px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+.shell{
+  max-width:840px;
+  margin:0 auto;
+  padding:0 24px 80px;
+}
+
+/* ---------- language switch ---------- */
+
+.langbar{
+  position:sticky;
+  top:0;
+  z-index:5;
+  display:flex;
+  justify-content:flex-end;
+  padding:14px 0 10px;
+  background:var(--bg);
+}
+.langbtn{
+  font-family:var(--font);
+  font-size:13px;
+  padding:6px 14px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--muted);
+  cursor:pointer;
+  transition:color .15s,background .15s,border-color .15s;
+}
+.langbtn:first-of-type{border-radius:6px 0 0 6px;border-right:none}
+.langbtn:last-of-type{border-radius:0 6px 6px 0}
+.langbtn[aria-pressed="true"]{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+  font-weight:600;
+}
+.langbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- header ---------- */
+
+.masthead{padding:28px 0 40px;border-bottom:1px solid var(--line)}
+
+.meta{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 20px;
+  margin-bottom:18px;
+}
+.meta b{color:var(--text);font-weight:600}
+
+.masthead h1{
+  font-size:clamp(28px,5vw,40px);
+  font-weight:700;
+  line-height:1.15;
+  letter-spacing:-.02em;
+  margin:0 0 16px;
+}
+
+.thesis{
+  font-size:17px;
+  color:var(--muted);
+  max-width:60ch;
+  margin:0;
+}
+
+/* ---------- summary ---------- */
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:16px;
+  margin:36px 0 40px;
+}
+.summary > div{
+  background:var(--bg-soft);
+  border:1px solid var(--line-soft);
+  border-radius:8px;
+  padding:20px;
+}
+.summary h3{
+  font-size:13px;
+  font-weight:600;
+  color:var(--accent);
+  margin:0 0 8px;
+}
+.summary p{margin:0;font-size:15px;line-height:1.6;color:var(--muted)}
+
+/* ---------- inventory ---------- */
+
+.inventory{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+  margin-bottom:48px;
+}
+.inv-col{padding:24px}
+.inv-col + .inv-col{border-left:1px solid var(--line);background:var(--bg-soft)}
+.inv-col h3{font-size:17px;font-weight:600;margin:0 0 2px}
+.inv-col p.hint{font-size:13px;color:var(--muted);margin:0 0 16px}
+.inv-col ul{list-style:none;margin:0;padding:0}
+.inv-col li{
+  position:relative;
+  padding-left:22px;
+  margin-bottom:12px;
+  font-size:15px;
+  line-height:1.5;
+}
+.inv-col li::before{position:absolute;left:0;top:0;font-family:var(--mono);font-size:14px}
+.inv-in li::before{content:"+";color:var(--accent)}
+.inv-out li::before{content:"\2212";color:#a3aab5}
+.inv-out li{color:var(--muted)}
+.inv-col li small{display:block;font-size:13px;color:var(--muted);line-height:1.45}
+
+/* ---------- body ---------- */
+
+.layout{display:grid;grid-template-columns:1fr;gap:40px;align-items:start}
+
+.toc{display:none}
+nav.toc ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line-soft)}
+nav.toc a{
+  display:block;
+  padding:6px 0 6px 14px;
+  margin-left:-2px;
+  border-left:2px solid transparent;
+  font-size:13.5px;
+  color:var(--muted);
+  text-decoration:none;
+  transition:color .15s,border-color .15s;
+}
+nav.toc a:hover{color:var(--accent);border-left-color:var(--accent)}
+nav.toc a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+section.clause{
+  padding-bottom:32px;
+  margin-bottom:32px;
+  border-bottom:1px solid var(--line-soft);
+}
+section.clause:last-of-type{border-bottom:none;margin-bottom:0}
+
+section.clause h2{
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:-.01em;
+  line-height:1.3;
+  margin:0 0 14px;
+  display:flex;
+  gap:12px;
+  align-items:baseline;
+}
+section.clause h2 .num{
+  font-family:var(--mono);
+  font-size:13px;
+  font-weight:600;
+  color:var(--accent);
+  flex:none;
+}
+
+section.clause p{margin:0 0 14px;max-width:68ch}
+section.clause p:last-child{margin-bottom:0}
+
+section.clause ul{margin:0 0 14px;padding-left:0;list-style:none;max-width:68ch}
+section.clause ul li{position:relative;padding-left:20px;margin-bottom:9px}
+section.clause ul li::before{
+  content:"";
+  position:absolute;
+  left:2px;top:.75em;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:#c3c9d2;
+}
+
+strong{font-weight:600}
+code{
+  font-family:var(--mono);
+  font-size:.9em;
+  background:var(--bg-soft);
+  border:1px solid var(--line-soft);
+  border-radius:4px;
+  padding:1px 5px;
+}
+
+/* ---------- contact ---------- */
+
+.contact{
+  border:1px solid var(--line);
+  background:var(--bg-soft);
+  border-radius:8px;
+  padding:24px;
+}
+.contact > p{margin:0}
+.contact dl{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:8px 20px;
+  margin:16px 0 0;
+  align-items:baseline;
+}
+.contact dt{font-size:13px;color:var(--muted)}
+.contact dd{margin:0;font-size:15px}
+.contact a{color:var(--accent);text-decoration:none}
+.contact a:hover{text-decoration:underline}
+
+footer{
+  margin-top:56px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--muted);
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 24px;
+}
+
+/* ---------- language visibility ---------- */
+
+[data-doc]{display:none}
+body[data-lang="vi"] [data-doc="vi"]{display:block}
+body[data-lang="en"] [data-doc="en"]{display:block}
+
+/* ---------- responsive ---------- */
+
+@media (min-width:900px){
+  .shell{max-width:960px}
+  .layout{grid-template-columns:180px 1fr;gap:48px}
+  .toc{display:block;position:sticky;top:60px}
+}
+
+@media (max-width:620px){
+  .shell{padding:0 18px 64px}
+  .inventory{grid-template-columns:1fr}
+  .inv-col + .inv-col{border-left:none;border-top:1px solid var(--line)}
+  .contact dl{grid-template-columns:1fr;gap:2px}
+  .contact dt{margin-top:12px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition-duration:.01ms !important}
+}
+</style>
+</head>
+
+<body data-lang="vi">
+<div class="shell">
+
+  <div class="langbar">
+    <button class="langbtn" data-set="vi" aria-pressed="true">Tiếng Việt</button>
+    <button class="langbtn" data-set="en" aria-pressed="false">English</button>
+  </div>
+
+  <!-- ============================ VIETNAMESE ============================ -->
+  <div data-doc="vi">
+
+    <header class="masthead">
+      <div class="meta">
+        <span>com.blackhole.app.dkm</span>
+        <span>Phiên bản <b>1.0</b></span>
+        <span>Hiệu lực từ <b>12/08/2026</b></span>
+      </div>
+      <h1>Chính sách bảo mật — BH Note</h1>
+      <p class="thesis">Ứng dụng nhắn tin nội bộ dành riêng cho nhân viên [TÊN CÔNG TY]. Trang này mô tả chính xác những dữ liệu ứng dụng xử lý, và những dữ liệu ứng dụng không bao giờ chạm tới.</p>
+    </header>
+
+    <div class="summary">
+      <div>
+        <h3>Ai dùng</h3>
+        <p>Chỉ nhân viên được cấp tài khoản. Ứng dụng không phát hành công khai và không cho phép tự đăng ký.</p>
+      </div>
+      <div>
+        <h3>Xử lý gì</h3>
+        <p>Tên đăng nhập, mật khẩu đã băm, cùng tin nhắn và ảnh do chính bạn chủ động gửi đi.</p>
+      </div>
+      <div>
+        <h3>Không làm gì</h3>
+        <p>Không quảng cáo, không theo dõi hành vi, không phân tích bên thứ ba, không bán hay trao đổi dữ liệu.</p>
+      </div>
+    </div>
+
+    <div class="inventory">
+      <div class="inv-col inv-in">
+        <h3>Ứng dụng xử lý</h3>
+        <p class="hint">Dữ liệu đi vào hệ thống</p>
+        <ul>
+          <li>Tên đăng nhập<small>Do quản trị viên cấp, dùng để nhận diện tài khoản</small></li>
+          <li>Mật khẩu<small>Lưu dưới dạng băm một chiều, không lưu văn bản gốc</small></li>
+          <li>Tin nhắn văn bản<small>Lưu để hiển thị lại cho bạn và người nhận</small></li>
+          <li>Ảnh bạn gửi<small>Chỉ những ảnh bạn chủ động chọn trong từng lần gửi</small></li>
+          <li>Thời gian gửi<small>Dùng để sắp xếp thứ tự hội thoại</small></li>
+        </ul>
+      </div>
+      <div class="inv-col inv-out">
+        <h3>Ứng dụng không thu thập</h3>
+        <p class="hint">Dữ liệu không bao giờ được đọc</p>
+        <ul>
+          <li>Vị trí GPS hoặc dữ liệu định vị</li>
+          <li>Danh bạ điện thoại</li>
+          <li>Thư viện ảnh, ngoài ảnh bạn chọn gửi</li>
+          <li>Số điện thoại, email cá nhân, số giấy tờ tùy thân</li>
+          <li>Mã định danh quảng cáo (IDFA) hoặc dữ liệu theo dõi</li>
+          <li>Lịch sử duyệt web, dữ liệu sức khỏe, thông tin thanh toán</li>
+          <li>Micro và camera khi không được bạn kích hoạt</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="layout">
+      <nav class="toc" aria-label="Mục lục">
+        <ol>
+          <li><a href="#vi-1">01 — Phạm vi áp dụng</a></li>
+          <li><a href="#vi-2">02 — Dữ liệu thu thập</a></li>
+          <li><a href="#vi-3">03 — Mục đích sử dụng</a></li>
+          <li><a href="#vi-4">04 — Lưu trữ và bảo mật</a></li>
+          <li><a href="#vi-5">05 — Chia sẻ dữ liệu</a></li>
+          <li><a href="#vi-6">06 — Thời gian lưu trữ</a></li>
+          <li><a href="#vi-7">07 — Quyền của bạn</a></li>
+          <li><a href="#vi-8">08 — Trẻ em</a></li>
+          <li><a href="#vi-9">09 — Thay đổi chính sách</a></li>
+          <li><a href="#vi-10">10 — Liên hệ</a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <section class="clause" id="vi-1">
+          <h2><span class="num">01</span>Phạm vi áp dụng</h2>
+          <p>Chính sách này áp dụng cho ứng dụng di động <strong>BH Note</strong> (định danh <code>com.blackhole.app.dkm</code>), một công cụ nhắn tin nội bộ do [TÊN CÔNG TY] phát triển và vận hành.</p>
+          <p>Ứng dụng chỉ dành cho nhân viên và cộng tác viên được cấp tài khoản. Người dùng không thể tự đăng ký; mọi tài khoản đều do quản trị viên của công ty tạo và quản lý.</p>
+        </section>
+
+        <section class="clause" id="vi-2">
+          <h2><span class="num">02</span>Dữ liệu chúng tôi thu thập</h2>
+          <p>Ứng dụng chỉ thu thập những dữ liệu tối thiểu cần thiết để hoạt động:</p>
+          <ul>
+            <li><strong>Thông tin tài khoản.</strong> Tên đăng nhập và mật khẩu. Mật khẩu được lưu dưới dạng băm một chiều; chúng tôi không lưu và không thể xem mật khẩu gốc của bạn.</li>
+            <li><strong>Nội dung bạn gửi.</strong> Tin nhắn văn bản và hình ảnh bạn chủ động gửi trong ứng dụng, cùng thời điểm gửi và người nhận.</li>
+          </ul>
+          <p>Ứng dụng chỉ truy cập thư viện ảnh tại thời điểm bạn chọn gửi một tấm ảnh cụ thể, và chỉ đọc đúng tấm ảnh đó. Ứng dụng không quét, không lập chỉ mục và không tải lên bất kỳ ảnh nào khác.</p>
+          <p>Ứng dụng không sử dụng bất kỳ công cụ phân tích, đo lường hay quảng cáo nào của bên thứ ba.</p>
+        </section>
+
+        <section class="clause" id="vi-3">
+          <h2><span class="num">03</span>Mục đích sử dụng</h2>
+          <p>Dữ liệu được dùng cho đúng một mục đích: vận hành chức năng nhắn tin nội bộ. Cụ thể là xác thực danh tính khi bạn đăng nhập, chuyển tin nhắn và ảnh tới đúng người nhận, và hiển thị lại lịch sử hội thoại cho những người tham gia.</p>
+          <p>Chúng tôi không dùng dữ liệu của bạn để xây dựng hồ sơ cá nhân, đánh giá hiệu suất tự động, huấn luyện mô hình học máy hay bất kỳ mục đích nào khác ngoài phạm vi nêu trên.</p>
+        </section>
+
+        <section class="clause" id="vi-4">
+          <h2><span class="num">04</span>Lưu trữ và bảo mật</h2>
+          <p>Dữ liệu được lưu trên máy chủ do [TÊN CÔNG TY] quản lý, đặt tại [ĐỊA ĐIỂM MÁY CHỦ].</p>
+          <p>Toàn bộ dữ liệu truyền giữa ứng dụng và máy chủ được mã hóa bằng giao thức HTTPS/TLS. Mật khẩu được băm trước khi lưu. Quyền truy cập cơ sở dữ liệu được giới hạn cho quản trị viên hệ thống được ủy quyền.</p>
+          <p>Không có hệ thống nào an toàn tuyệt đối. Chúng tôi áp dụng các biện pháp bảo vệ hợp lý theo thông lệ ngành, nhưng không thể cam kết an toàn tuyệt đối trước mọi hình thức tấn công.</p>
+        </section>
+
+        <section class="clause" id="vi-5">
+          <h2><span class="num">05</span>Chia sẻ dữ liệu</h2>
+          <p>Chúng tôi <strong>không bán, không cho thuê và không trao đổi</strong> dữ liệu của bạn với bất kỳ bên thứ ba nào.</p>
+          <p>Tin nhắn và ảnh chỉ hiển thị cho những người tham gia cuộc trò chuyện đó. Ngoại lệ duy nhất là khi có yêu cầu hợp pháp bằng văn bản từ cơ quan nhà nước có thẩm quyền theo quy định của pháp luật Việt Nam.</p>
+        </section>
+
+        <section class="clause" id="vi-6">
+          <h2><span class="num">06</span>Thời gian lưu trữ</h2>
+          <p>Tin nhắn và ảnh được lưu trong thời gian tài khoản của bạn còn hoạt động, hoặc trong [SỐ] tháng kể từ ngày gửi, tùy điều kiện nào đến trước.</p>
+          <p>Khi tài khoản bị vô hiệu hóa, dữ liệu liên quan sẽ được xóa khỏi hệ thống trong vòng [SỐ] ngày, trừ phần cần lưu để đáp ứng nghĩa vụ pháp lý.</p>
+        </section>
+
+        <section class="clause" id="vi-7">
+          <h2><span class="num">07</span>Quyền của bạn</h2>
+          <p>Bạn có quyền yêu cầu xem bản sao dữ liệu cá nhân của mình, yêu cầu chỉnh sửa thông tin không chính xác, yêu cầu xóa tài khoản và dữ liệu liên quan, hoặc rút lại sự đồng ý và ngừng sử dụng ứng dụng.</p>
+          <p>Để thực hiện, hãy liên hệ theo thông tin ở mục 10. Chúng tôi phản hồi trong vòng 30 ngày làm việc.</p>
+        </section>
+
+        <section class="clause" id="vi-8">
+          <h2><span class="num">08</span>Trẻ em</h2>
+          <p>Ứng dụng dành cho người lao động từ đủ 18 tuổi trở lên và không hướng tới trẻ em. Chúng tôi không cố ý thu thập dữ liệu của người dưới 16 tuổi. Nếu phát hiện, dữ liệu sẽ được xóa ngay khi được thông báo.</p>
+        </section>
+
+        <section class="clause" id="vi-9">
+          <h2><span class="num">09</span>Thay đổi chính sách</h2>
+          <p>Chính sách có thể được cập nhật khi ứng dụng thay đổi chức năng. Ngày hiệu lực ở đầu trang luôn phản ánh phiên bản mới nhất. Với thay đổi ảnh hưởng đáng kể tới quyền của bạn, chúng tôi sẽ thông báo trong ứng dụng trước khi áp dụng.</p>
+        </section>
+
+        <section class="clause" id="vi-10">
+          <h2><span class="num">10</span>Liên hệ</h2>
+          <div class="contact">
+            <p>Mọi câu hỏi về chính sách này hoặc về dữ liệu của bạn, vui lòng liên hệ:</p>
+            <dl>
+              <dt>Đơn vị</dt><dd>[TÊN CÔNG TY]</dd>
+              <dt>Địa chỉ</dt><dd>[ĐỊA CHỈ CÔNG TY]</dd>
+              <dt>Email</dt><dd><a href="mailto:privacy@example.com">privacy@example.com</a></dd>
+              <dt>Điện thoại</dt><dd>[SỐ ĐIỆN THOẠI]</dd>
+            </dl>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      <span>BH Note</span>
+      <span>com.blackhole.app.dkm</span>
+      <span>Cập nhật 12/08/2026</span>
+    </footer>
+  </div>
+
+  <!-- ============================== ENGLISH ============================== -->
+  <div data-doc="en">
+
+    <header class="masthead">
+      <div class="meta">
+        <span>com.blackhole.app.dkm</span>
+        <span>Version <b>1.0</b></span>
+        <span>Effective <b>12 Aug 2026</b></span>
+      </div>
+      <h1>Privacy Policy — BH Note</h1>
+      <p class="thesis">An internal messaging app used only by staff at [COMPANY NAME]. This page states exactly what data the app handles, and what it never touches.</p>
+    </header>
+
+    <div class="summary">
+      <div>
+        <h3>Who uses it</h3>
+        <p>Staff with issued accounts only. The app is not publicly distributed and has no self sign-up.</p>
+      </div>
+      <div>
+        <h3>What it handles</h3>
+        <p>A username, a hashed password, and the messages and images you choose to send.</p>
+      </div>
+      <div>
+        <h3>What it never does</h3>
+        <p>No ads, no behavioural tracking, no third-party analytics, no selling or sharing of data.</p>
+      </div>
+    </div>
+
+    <div class="inventory">
+      <div class="inv-col inv-in">
+        <h3>The app handles</h3>
+        <p class="hint">Data entering the system</p>
+        <ul>
+          <li>Username<small>Issued by an administrator, used to identify your account</small></li>
+          <li>Password<small>Stored as a one-way hash; the original is never kept</small></li>
+          <li>Text messages<small>Stored so you and the recipient can read them again</small></li>
+          <li>Images you send<small>Only the specific photos you pick for each send</small></li>
+          <li>Timestamps<small>Used to order conversations correctly</small></li>
+        </ul>
+      </div>
+      <div class="inv-col inv-out">
+        <h3>The app does not collect</h3>
+        <p class="hint">Data never read</p>
+        <ul>
+          <li>GPS or any location data</li>
+          <li>Phone contacts</li>
+          <li>Your photo library, beyond photos you pick to send</li>
+          <li>Phone numbers, personal email, government ID numbers</li>
+          <li>Advertising identifiers (IDFA) or tracking data</li>
+          <li>Browsing history, health data, payment information</li>
+          <li>Microphone or camera outside actions you start</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="layout">
+      <nav class="toc" aria-label="Contents">
+        <ol>
+          <li><a href="#en-1">01 — Scope</a></li>
+          <li><a href="#en-2">02 — Data we collect</a></li>
+          <li><a href="#en-3">03 — How we use it</a></li>
+          <li><a href="#en-4">04 — Storage and security</a></li>
+          <li><a href="#en-5">05 — Sharing</a></li>
+          <li><a href="#en-6">06 — Retention</a></li>
+          <li><a href="#en-7">07 — Your rights</a></li>
+          <li><a href="#en-8">08 — Children</a></li>
+          <li><a href="#en-9">09 — Changes</a></li>
+          <li><a href="#en-10">10 — Contact</a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <section class="clause" id="en-1">
+          <h2><span class="num">01</span>Scope</h2>
+          <p>This policy covers the mobile app <strong>BH Note</strong> (bundle identifier <code>com.blackhole.app.dkm</code>), an internal messaging tool built and operated by [COMPANY NAME].</p>
+          <p>The app is for employees and contractors with issued accounts. Users cannot register themselves; every account is created and managed by a company administrator.</p>
+        </section>
+
+        <section class="clause" id="en-2">
+          <h2><span class="num">02</span>Data we collect</h2>
+          <p>The app collects only the minimum needed to function:</p>
+          <ul>
+            <li><strong>Account information.</strong> A username and password. Passwords are stored as one-way hashes; we do not store and cannot read your original password.</li>
+            <li><strong>Content you send.</strong> Text messages and images you actively send in the app, along with the send time and recipient.</li>
+          </ul>
+          <p>The app accesses your photo library only at the moment you pick a specific photo to send, and reads only that photo. It does not scan, index, or upload anything else.</p>
+          <p>The app uses no third-party analytics, measurement, or advertising tools.</p>
+        </section>
+
+        <section class="clause" id="en-3">
+          <h2><span class="num">03</span>How we use it</h2>
+          <p>Data serves exactly one purpose: running the internal messaging feature. That means authenticating you at sign-in, delivering messages and images to the right recipient, and showing conversation history back to the people in it.</p>
+          <p>We do not use your data to build personal profiles, run automated performance scoring, train machine learning models, or anything else beyond the purpose above.</p>
+        </section>
+
+        <section class="clause" id="en-4">
+          <h2><span class="num">04</span>Storage and security</h2>
+          <p>Data is stored on servers managed by [COMPANY NAME], located in [SERVER LOCATION].</p>
+          <p>All traffic between the app and the server is encrypted with HTTPS/TLS. Passwords are hashed before storage. Database access is limited to authorised system administrators.</p>
+          <p>No system is perfectly secure. We apply reasonable industry-standard safeguards, but cannot guarantee absolute protection against every form of attack.</p>
+        </section>
+
+        <section class="clause" id="en-5">
+          <h2><span class="num">05</span>Sharing</h2>
+          <p>We do <strong>not sell, rent, or trade</strong> your data with any third party.</p>
+          <p>Messages and images are visible only to the people in that conversation. The single exception is a lawful written request from a competent state authority under Vietnamese law.</p>
+        </section>
+
+        <section class="clause" id="en-6">
+          <h2><span class="num">06</span>Retention</h2>
+          <p>Messages and images are kept while your account remains active, or for [N] months from the send date, whichever comes first.</p>
+          <p>When an account is deactivated, related data is removed within [N] days, except anything we must keep to meet a legal obligation.</p>
+        </section>
+
+        <section class="clause" id="en-7">
+          <h2><span class="num">07</span>Your rights</h2>
+          <p>You can request a copy of your personal data, ask us to correct inaccurate information, request deletion of your account and related data, or withdraw consent and stop using the app.</p>
+          <p>To do any of these, use the contact details in section 10. We respond within 30 working days.</p>
+        </section>
+
+        <section class="clause" id="en-8">
+          <h2><span class="num">08</span>Children</h2>
+          <p>The app is for workers aged 18 and over and is not directed at children. We do not knowingly collect data from anyone under 16. If we learn we have, the data is deleted as soon as we are notified.</p>
+        </section>
+
+        <section class="clause" id="en-9">
+          <h2><span class="num">09</span>Changes</h2>
+          <p>This policy may be updated as the app changes. The effective date at the top always reflects the current version. For changes that materially affect your rights, we will notify you in the app before they take effect.</p>
+        </section>
+
+        <section class="clause" id="en-10">
+          <h2><span class="num">10</span>Contact</h2>
+          <div class="contact">
+            <p>For any question about this policy or about your data, contact:</p>
+            <dl>
+              <dt>Company</dt><dd>[COMPANY NAME]</dd>
+              <dt>Address</dt><dd>[COMPANY ADDRESS]</dd>
+              <dt>Email</dt><dd><a href="mailto:privacy@example.com">privacy@example.com</a></dd>
+              <dt>Phone</dt><dd>[PHONE NUMBER]</dd>
+            </dl>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      <span>BH Note</span>
+      <span>com.blackhole.app.dkm</span>
+      <span>Updated 12 Aug 2026</span>
+    </footer>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.langbtn');
+  function setLang(lang) {
+    document.body.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.set === lang));
+    });
+    try { localStorage.setItem('bh-policy-lang', lang); } catch (e) {}
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.dataset.set); });
+  });
+  var saved = null;
+  try { saved = localStorage.getItem('bh-policy-lang'); } catch (e) {}
+  setLang(saved === 'en' ? 'en' : 'vi');
+})();
+</script>
+</body>
+</html>
